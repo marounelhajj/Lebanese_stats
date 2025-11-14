@@ -7,12 +7,9 @@
 
 <div class="row mb-4">
     <div class="col-md-3 text-center">
-        {% if team.logo %}
-            <img src="{{ team.logo.url }}"
-                 alt="{{ team.name }} logo"
-                 class="img-fluid mb-3"
-                 style="max-height: 180px; object-fit: contain;">
-        {% endif %}
+
+        <!-- LOGO REMOVED -->
+
     </div>
     <div class="col-md-9">
         <h1>{{ team.name }}</h1>
@@ -27,7 +24,7 @@
     </div>
 </section>
 
-<!-- Small charts row -->
+<!-- Charts -->
 <section class="mb-4">
     <div class="row g-4">
         <div class="col-md-6">
@@ -95,9 +92,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="12" class="text-center">
-                        No players for this team.
-                    </td>
+                    <td colspan="12" class="text-center">No players for this team.</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -105,59 +100,40 @@
 </div>
 
 <script>
-    // Top Scorers chart
+    // Charts (unchanged)
     const scorersCtx = document.getElementById('scorersChart');
     if (scorersCtx) {
         new Chart(scorersCtx, {
             type: 'bar',
             data: {
                 labels: {{ scorers_names|safe }},
-                datasets: [{
-                    data: {{ scorers_points|safe }},
-                }]
+                datasets: [{ data: {{ scorers_points|safe }} }]
             },
-            options: {
-                plugins: { legend: { display: false } },
-                responsive: true,
-                maintainAspectRatio: false,
-            }
+            options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
         });
     }
 
-    // Top Rebounders chart
     const reboundCtx = document.getElementById('reboundChart');
     if (reboundCtx) {
         new Chart(reboundCtx, {
             type: 'bar',
             data: {
                 labels: {{ rebound_names|safe }},
-                datasets: [{
-                    data: {{ rebound_values|safe }},
-                }]
+                datasets: [{ data: {{ rebound_values|safe }} }]
             },
-            options: {
-                plugins: { legend: { display: false } },
-                responsive: true,
-                maintainAspectRatio: false,
-            }
+            options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
         });
     }
 
-    // Scoring Distribution pie chart
     const pieCtx = document.getElementById('pieChart');
     if (pieCtx) {
         new Chart(pieCtx, {
             type: 'pie',
             data: {
                 labels: {{ pie_labels|safe }},
-                datasets: [{
-                    data: {{ pie_values|safe }},
-                }]
+                datasets: [{ data: {{ pie_values|safe }} }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            }
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 </script>

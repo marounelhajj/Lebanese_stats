@@ -1,48 +1,132 @@
-{% extends 'stats/base.html' %}
-{% load static %}
+{% extends "stats/base.html" %}
+{% load custom_filters %}
 
-{% block title %}Teams{% endblock %}
+{% block title %}Teams – League Stats{% endblock %}
 
 {% block content %}
 
-<h1 class="fw-bold mb-4">Teams</h1>
+<h1 class="mb-4">Teams</h1>
 
-<h3 class="mb-3">League Leaders</h3>
+<!-- League-wide leaders -->
+<section class="mb-4">
+    <h2 class="h4 mb-3">League Leaders</h2>
+    <div class="row g-3">
 
-<div class="row mb-5">
-    {% for leader in leaders %}
-    <div class="col-md-2">
-        <div class="card text-center p-2 shadow-sm">
-            <h6 class="fw-bold">{{ leader.title }}</h6>
-            <p class="mb-0">{{ leader.player }}</p>
-            <small class="text-muted">{{ leader.team }}</small>
-            <p class="fw-bold mt-1">{{ leader.value }}</p>
-        </div>
+        {% if best_scorer %}
+            <div class="col-md-4 col-lg-2">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fs-6 mb-1">Top Scorer</h5>
+                        <p class="mb-0 fw-semibold">{{ best_scorer.name }}</p>
+                        <small class="text-muted">{{ best_scorer.team.name }}</small>
+                        <p class="mb-0 mt-1">
+                            <span class="fw-bold">
+                                {{ best_scorer.points_per_game|floatformat:1 }}
+                            </span> PPG
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if best_rebounder %}
+            <div class="col-md-4 col-lg-2">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fs-6 mb-1">Top Rebounder</h5>
+                        <p class="mb-0 fw-semibold">{{ best_rebounder.name }}</p>
+                        <small class="text-muted">{{ best_rebounder.team.name }}</small>
+                        <p class="mb-0 mt-1">
+                            <span class="fw-bold">
+                                {{ best_rebounder.rebounds_per_game|floatformat:1 }}
+                            </span> REB
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if assist_leader %}
+            <div class="col-md-4 col-lg-2">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fs-6 mb-1">Assist Leader</h5>
+                        <p class="mb-0 fw-semibold">{{ assist_leader.name }}</p>
+                        <small class="text-muted">{{ assist_leader.team.name }}</small>
+                        <p class="mb-0 mt-1">
+                            <span class="fw-bold">
+                                {{ assist_leader.assists_per_game|floatformat:1 }}
+                            </span> AST
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if best_two_pct %}
+            <div class="col-md-4 col-lg-2">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fs-6 mb-1">Best 2PT%</h5>
+                        <p class="mb-0 fw-semibold">{{ best_two_pct.name }}</p>
+                        <small class="text-muted">{{ best_two_pct.team.name }}</small>
+                        <p class="mb-0 mt-1">
+                            <span class="fw-bold">
+                                {{ best_two_pct.two_points_pct|mul100|floatformat:1 }}%
+                            </span> 2PT
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if best_three_pct %}
+            <div class="col-md-4 col-lg-2">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fs-6 mb-1">Best 3PT%</h5>
+                        <p class="mb-0 fw-semibold">{{ best_three_pct.name }}</p>
+                        <small class="text-muted">{{ best_three_pct.team.name }}</small>
+                        <p class="mb-0 mt-1">
+                            <span class="fw-bold">
+                                {{ best_three_pct.three_points_pct|mul100|floatformat:1 }}%
+                            </span> 3PT
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    {% endfor %}
-</div>
+</section>
 
-<h3 class="mb-3">Teams</h3>
+<!-- Teams grid -->
+<section>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for team in teams %}
+            <div class="col">
+                <div class="card h-100 text-center shadow-sm border-0">
 
-<div class="row">
-    {% for team in teams %}
-    <div class="col-md-3 mb-4">
-        <div class="card shadow-sm text-center p-2">
+                    <!-- LOGO REMOVED -->
 
-            <!-- TEAM LOGO -->
-            <img 
-                src="{% static 'team_logos/' %}{{ team.logo }}" 
-                class="img-fluid"
-                style="height:100px; object-fit:contain;"
-                alt="{{ team.name }} logo">
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">
+                            <a href="{% url 'team_detail' team.id %}"
+                               class="stretched-link text-decoration-none">
+                                {{ team.name }}
+                            </a>
+                        </h5>
+                    </div>
 
-            <a href="{% url 'team_detail' team.id %}" class="mt-2 h5 text-decoration-none">
-                {{ team.name }}
-            </a>
-
-        </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p class="text-center text-muted">
+                    No teams in the database yet.
+                </p>
+            </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
+</section>
 
 {% endblock %}
