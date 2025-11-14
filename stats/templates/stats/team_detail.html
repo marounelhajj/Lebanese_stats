@@ -1,0 +1,165 @@
+{% extends "stats/base.html" %}
+{% load custom_filters %}
+
+{% block title %}{{ team.name }} – League Stats{% endblock %}
+
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-md-3 text-center">
+        {% if team.logo %}
+            <img src="{{ team.logo.url }}"
+                 alt="{{ team.name }} logo"
+                 class="img-fluid mb-3"
+                 style="max-height: 180px; object-fit: contain;">
+        {% endif %}
+    </div>
+    <div class="col-md-9">
+        <h1>{{ team.name }}</h1>
+    </div>
+</div>
+
+<!-- AI-style scouting report -->
+<section class="mb-4">
+    <h2 class="h5">Scouting Report</h2>
+    <div class="alert alert-secondary" role="alert">
+        {{ scouting_report }}
+    </div>
+</section>
+
+<!-- Small charts row -->
+<section class="mb-4">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h4 class="h6">Top Scorers</h4>
+            <div style="height: 200px;">
+                <canvas id="scorersChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h4 class="h6">Top Rebounders</h4>
+            <div style="height: 200px;">
+                <canvas id="reboundChart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="h6">Scoring Distribution</h4>
+            <div style="height: 220px; max-width: 350px;">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="my-4">
+
+<h3 class="h5">Players</h3>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Player</th>
+                <th>#</th>
+                <th>POS</th>
+                <th>Games</th>
+                <th>PTS</th>
+                <th>REB</th>
+                <th>AST</th>
+                <th>MIN</th>
+                <th>Rating</th>
+                <th>Fouls</th>
+                <th>2PT %</th>
+                <th>3PT %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in players %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.number }}</td>
+                    <td>{{ p.position }}</td>
+                    <td>{{ p.games }}</td>
+                    <td>{{ p.points_per_game }}</td>
+                    <td>{{ p.rebounds_per_game }}</td>
+                    <td>{{ p.assists_per_game }}</td>
+                    <td>{{ p.minutes_per_game }}</td>
+                    <td>{{ p.rating }}</td>
+                    <td>{{ p.fouls_per_game }}</td>
+                    <td>{{ p.two_points_pct|mul100|floatformat:1 }}</td>
+                    <td>{{ p.three_points_pct|mul100|floatformat:1 }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12" class="text-center">
+                        No players for this team.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Top Scorers chart
+    const scorersCtx = document.getElementById('scorersChart');
+    if (scorersCtx) {
+        new Chart(scorersCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ scorers_names|safe }},
+                datasets: [{
+                    data: {{ scorers_points|safe }},
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+
+    // Top Rebounders chart
+    const reboundCtx = document.getElementById('reboundChart');
+    if (reboundCtx) {
+        new Chart(reboundCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ rebound_names|safe }},
+                datasets: [{
+                    data: {{ rebound_values|safe }},
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+
+    // Scoring Distribution pie chart
+    const pieCtx = document.getElementById('pieChart');
+    if (pieCtx) {
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ pie_labels|safe }},
+                datasets: [{
+                    data: {{ pie_values|safe }},
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+</script>
+
+{% endblock %}

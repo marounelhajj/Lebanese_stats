@@ -8,8 +8,8 @@ SECRET_KEY = "change-this-secret-key-for-dev"
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*','lebanese_stats.azurewebsites.net']
-CSRF_TRUSTED_ORIGINS = ['https://lebanese_stats.azurewebsites.net']
+ALLOWED_HOSTS = ['*','lebanesestats.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = ['https://lebanesestats.azurewebsites.net']
 
 INSTALLED_APPS = [
     "django.contrib.admin",

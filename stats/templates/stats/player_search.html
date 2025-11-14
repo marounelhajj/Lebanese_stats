@@ -1,0 +1,137 @@
+{% extends "stats/base.html" %}
+{% load custom_filters %}
+
+{% block title %}Player Search – League Stats{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Player Search</h1>
+
+<form method="get" action="{% url 'player_search' %}" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Club</label>
+            <select name="team_id" class="form-select">
+                <option value="all">All clubs</option>
+                {% for team in teams %}
+                    <option value="{{ team.id }}"
+                        {% if selected_team_id|default:"all" == team.id|stringformat:"s" %}selected{% endif %}>
+                        {{ team.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Position</label>
+            <select name="position" class="form-select">
+                <option value="all" {% if selected_position == "all" %}selected{% endif %}>All</option>
+                <option value="Guard" {% if selected_position == "Guard" %}selected{% endif %}>Guard</option>
+                <option value="Forward" {% if selected_position == "Forward" %}selected{% endif %}>Forward</option>
+                <option value="Center" {% if selected_position == "Center" %}selected{% endif %}>Center</option>
+                <option value="Guard / Forward" {% if selected_position == "Guard / Forward" %}selected{% endif %}>Guard / Forward</option>
+                <option value="Forward / Center" {% if selected_position == "Forward / Center" %}selected{% endif %}>Forward / Center</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Min points</label>
+            <input type="number" step="0.1" name="min_points"
+                   class="form-control" value="{{ params.min_points }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Min rebounds</label>
+            <input type="number" step="0.1" name="min_rebounds"
+                   class="form-control" value="{{ params.min_rebounds }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Min assists</label>
+            <input type="number" step="0.1" name="min_assists"
+                   class="form-control" value="{{ params.min_assists }}">
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Min minutes</label>
+            <input type="number" step="0.1" name="min_minutes"
+                   class="form-control" value="{{ params.min_minutes }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Min rating</label>
+            <input type="number" step="0.1" name="min_rating"
+                   class="form-control" value="{{ params.min_rating }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Max fouls</label>
+            <input type="number" step="0.1" name="max_fouls"
+                   class="form-control" value="{{ params.max_fouls }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Min 2PT %</label>
+            <input type="number" step="0.1" name="min_two_pt"
+                   class="form-control" placeholder="e.g. 45"
+                   value="{{ params.min_two_pt }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Min 3PT %</label>
+            <input type="number" step="0.1" name="min_three_pt"
+                   class="form-control" placeholder="e.g. 35"
+                   value="{{ params.min_three_pt }}">
+        </div>
+
+        <div class="col-12 d-flex gap-2 mt-2">
+            <button type="submit" class="btn btn-success">Search</button>
+            <a href="{% url 'team_list' %}" class="btn btn-outline-secondary">
+                Back to Home
+            </a>
+        </div>
+    </div>
+</form>
+
+<h3 class="mt-4">Results ({{ players|length }} players)</h3>
+
+<div class="table-responsive mt-2">
+    <table class="table table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Player</th>
+                <th>Team</th>
+                <th>#</th>
+                <th>POS</th>
+                <th>PTS</th>
+                <th>REB</th>
+                <th>AST</th>
+                <th>MIN</th>
+                <th>Rating</th>
+                <th>Fouls</th>
+                <th>2PT %</th>
+                <th>3PT %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in players %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.team.name }}</td>
+                    <td>{{ p.number }}</td>
+                    <td>{{ p.position }}</td>
+                    <td>{{ p.points_per_game }}</td>
+                    <td>{{ p.rebounds_per_game }}</td>
+                    <td>{{ p.assists_per_game }}</td>
+                    <td>{{ p.minutes_per_game }}</td>
+                    <td>{{ p.rating }}</td>
+                    <td>{{ p.fouls_per_game }}</td>
+                    <td>{{ p.two_points_pct|mul100|floatformat:1 }}</td>
+                    <td>{{ p.three_points_pct|mul100|floatformat:1 }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12" class="text-center">
+                        No players match your criteria.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
